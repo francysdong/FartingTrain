@@ -1,13 +1,16 @@
 fileFormatVersion: 2
-guid: 6984b25ac9dd9214c890dad7d14d37c2
+guid: fa6ec1bdb736f3d44b38f3dc62492ac0
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1238307622614846882
-    second: shizu_walk_0_0
+      213: -6198205811937794876
+    second: npc_0_notice_M_0_0
   - first:
-      213: -9174344544127238487
-    second: shizu_walk_0_1
+      213: -8369979186059282419
+    second: npc_0_notice_M_0_1
+  - first:
+      213: -3422467825878208384
+    second: npc_0_notice_M_0_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -103,13 +106,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: shizu_walk_0_0
+      name: npc_0_notice_M_0_0
       rect:
         serializedVersion: 2
-        x: 65
-        y: 17
-        width: 20
-        height: 18
+        x: 182
+        y: 121
+        width: 235
+        height: 506
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -118,20 +121,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 2adcd90d83a5f2110800000000000000
-      internalID: 1238307622614846882
+      spriteID: 4c4afae47ac8bf9a0800000000000000
+      internalID: -6198205811937794876
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: shizu_walk_0_1
+      name: npc_0_notice_M_0_1
       rect:
         serializedVersion: 2
-        x: 78
-        y: 23
-        width: 493
-        height: 911
+        x: 403
+        y: 574
+        width: 83
+        height: 93
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -140,8 +143,30 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 9aeb040be3e2ea080800000000000000
-      internalID: -9174344544127238487
+      spriteID: d08f58db64cd7db80800000000000000
+      internalID: -8369979186059282419
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: npc_0_notice_M_0_2
+      rect:
+        serializedVersion: 2
+        x: 412
+        y: 546
+        width: 28
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 080735735a3f080d0800000000000000
+      internalID: -3422467825878208384
       vertices: []
       indices: 
       edges: []
@@ -160,8 +185,9 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      shizu_walk_0_0: 1238307622614846882
-      shizu_walk_0_1: -9174344544127238487
+      npc_0_notice_M_0_0: -6198205811937794876
+      npc_0_notice_M_0_1: -8369979186059282419
+      npc_0_notice_M_0_2: -3422467825878208384
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

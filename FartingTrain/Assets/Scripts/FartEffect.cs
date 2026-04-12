@@ -6,42 +6,75 @@ public class FartEffect : MonoBehaviour
     public float lifetime = 2.5f;
 
     [Header("初速度")]
-    public float launchSpeedMin = 2f;        // 喷出最小速度
-    public float launchSpeedMax = 3.5f;      // 喷出最大速度
-    public float launchAngleMin = 100f;      // 喷出角度范围（相对正右方，朝后上方）
+    public float launchSpeedMin = 2f;
+    public float launchSpeedMax = 3.5f;
+    public float launchAngleMin = 100f;
     public float launchAngleMax = 150f;
 
     [Header("物理衰减")]
-    public float drag = 2.5f;                // 速度衰减系数
+    public float drag = 2.5f;
 
     [Header("缩放")]
-    public float maxScaleMultiplier = 2.5f;  // 最终膨胀到初始的几倍
-    public float scaleInDuration = 0.2f;     // 初始弹出时间
+    public float maxScaleMultiplier = 2.5f;
+    public float scaleInDuration = 0.2f;
 
     [Header("透明度")]
-    public float fadeStartTime = 0.5f;       // 从生命周期几成开始淡出
+    public float fadeStartTime = 0.5f;
+
+    [Header("蓄力范围")]
+    public float chargeMinScale = 0.5f;
+    public float chargeMaxScale = 2f;
+    public float chargeMinSpeed = 0.5f;
+    public float chargeMaxSpeed = 2f;
+
+    [Header("NPC检测")]
+    public LayerMask npcLayer;
 
     private float timer = 0f;
     private Vector3 initialScale;
     private SpriteRenderer sr;
     private Animator animator;
     private bool outTriggered = false;
+    private Vector2 velocity;
+    private NPCController lastHitNPC = null;
 
-    private Vector2 velocity;               // 当前速度
+    public float CurrentSize => transform.localScale.x;
 
-    void Start()
+    void Awake()
     {
         initialScale = transform.localScale;
         sr = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
 
-        // 随机喷出方向（后上方扇形范围内）
+        Rigidbody2D rb = gameObject.AddComponent<Rigidbody2D>();
+        rb.gravityScale = 0f;
+        rb.isKinematic = true;
+
+        CircleCollider2D col = gameObject.AddComponent<CircleCollider2D>();
+        col.isTrigger = true;
+
+        InitVelocity(1f, 1f);
+        transform.rotation = Quaternion.Euler(0, 0, Random.Range(0f, 360f));
+    }
+
+    public void ApplyCharge(float chargeRatio, float facingDirection)
+    {
+        float scaleMult = Mathf.Lerp(chargeMinScale, chargeMaxScale, chargeRatio);
+        float speedMult = Mathf.Lerp(chargeMinSpeed, chargeMaxSpeed, chargeRatio);
+
+        transform.localScale = initialScale * scaleMult;
+        initialScale = transform.localScale;
+
+        InitVelocity(speedMult, facingDirection);
+    }
+
+    void InitVelocity(float speedMult, float facingDirection)
+    {
         float angle = Random.Range(launchAngleMin, launchAngleMax);
         float rad = angle * Mathf.Deg2Rad;
-        float speed = Random.Range(launchSpeedMin, launchSpeedMax);
-        velocity = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad)) * speed;
+        float speed = Random.Range(launchSpeedMin, launchSpeedMax) * speedMult;
 
-        transform.rotation = Quaternion.Euler(0, 0, Random.Range(0f, 360f));
+        velocity = new Vector2(Mathf.Cos(rad) * facingDirection, Mathf.Sin(rad)) * speed;
     }
 
     void Update()
@@ -49,19 +82,22 @@ public class FartEffect : MonoBehaviour
         timer += Time.deltaTime;
         float progress = timer / lifetime;
 
-        // === 速度衰减（模拟空气阻力）===
+        // 速度衰减
         velocity = Vector2.Lerp(velocity, Vector2.zero, drag * Time.deltaTime);
         transform.position += (Vector3)(velocity * Time.deltaTime);
 
-        // === 缩放：弹出 → 持续膨胀 ===
-        float burstScale = Mathf.Clamp01(timer / scaleInDuration);           // 0→1 快速弹出
-        float growScale = Mathf.Lerp(1f, maxScaleMultiplier, progress);      // 1→max 持续膨胀
+        // 缩放
+        float burstScale = Mathf.Clamp01(timer / scaleInDuration);
+        float growScale = Mathf.Lerp(1f, maxScaleMultiplier, progress);
         transform.localScale = initialScale * burstScale * growScale;
 
-        // === 缓慢自转（越来越慢）===
+        // 自转
         transform.Rotate(0f, 0f, 20f * (1f - progress) * Time.deltaTime);
 
-        // === 透明度淡出 ===
+        // 主动检测 NPC
+        CheckNPCContact();
+
+        // 透明度淡出
         if (sr != null)
         {
             float fadeProgress = Mathf.InverseLerp(fadeStartTime, 1f, progress);
@@ -79,5 +115,36 @@ public class FartEffect : MonoBehaviour
             if (c.a <= 0f)
                 Destroy(gameObject);
         }
+    }
+
+    void CheckNPCContact()
+    {
+        // 去掉 timer < scaleInDuration 的等待
+        float radius = transform.localScale.x * 0.5f;
+        Collider2D hit = Physics2D.OverlapCircle(transform.position, radius, npcLayer);
+
+        if (hit != null)
+        {
+            NPCController npc = hit.GetComponent<NPCController>();
+            if (npc != null)
+            {
+                lastHitNPC = npc;
+                npc.OnFartContact(CurrentSize);
+            }
+        }
+        else
+        {
+            if (lastHitNPC != null)
+            {
+                lastHitNPC.OnFartLeave();
+                lastHitNPC = null;
+            }
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (lastHitNPC != null)
+            lastHitNPC.OnFartLeave();
     }
 }

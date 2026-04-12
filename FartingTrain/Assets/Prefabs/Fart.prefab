@@ -124,11 +124,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lifetime: 3
-  launchSpeedMin: 2
-  launchSpeedMax: 4
-  launchAngleMin: 100
+  launchSpeedMin: 1
+  launchSpeedMax: 2.5
+  launchAngleMin: 90
   launchAngleMax: 150
   drag: 1
   maxScaleMultiplier: 2.5
   scaleInDuration: 0.3
   fadeStartTime: 0.6
+  chargeMinScale: 0.5
+  chargeMaxScale: 2
+  chargeMinSpeed: 0.5
+  chargeMaxSpeed: 2
+  npcLayer:
+    serializedVersion: 2
+    m_Bits: 128

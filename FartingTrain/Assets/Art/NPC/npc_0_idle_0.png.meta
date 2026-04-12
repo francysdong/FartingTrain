@@ -1,13 +1,10 @@
 fileFormatVersion: 2
-guid: 6984b25ac9dd9214c890dad7d14d37c2
+guid: dec436a354c621b48b616abfa32f3d19
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1238307622614846882
-    second: shizu_walk_0_0
-  - first:
-      213: -9174344544127238487
-    second: shizu_walk_0_1
+      213: 2840228865907259836
+    second: npc_0_idle_0_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -103,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: shizu_walk_0_0
+      name: npc_0_idle_0_0
       rect:
         serializedVersion: 2
-        x: 65
-        y: 17
-        width: 20
-        height: 18
+        x: 181
+        y: 121
+        width: 237
+        height: 493
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -118,30 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 2adcd90d83a5f2110800000000000000
-      internalID: 1238307622614846882
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: shizu_walk_0_1
-      rect:
-        serializedVersion: 2
-        x: 78
-        y: 23
-        width: 493
-        height: 911
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 9aeb040be3e2ea080800000000000000
-      internalID: -9174344544127238487
+      spriteID: cb97639fa158a6720800000000000000
+      internalID: 2840228865907259836
       vertices: []
       indices: 
       edges: []
@@ -160,8 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      shizu_walk_0_0: 1238307622614846882
-      shizu_walk_0_1: -9174344544127238487
+      npc_0_idle_0_0: 2840228865907259836
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
