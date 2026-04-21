@@ -65,5 +65,8 @@ public class NPCController : MonoBehaviour
         if (level == 1) animator.Play("ReactSmall", 0, 0f);
         else if (level == 2) animator.Play("ReactMedium", 0, 0f);
         else if (level == 3) animator.Play("ReactLarge", 0, 0f);
+
+        // 通知 InnocentManager 扣除清白值
+        InnocentManager.Instance?.Deduct(level);
     }
 }
