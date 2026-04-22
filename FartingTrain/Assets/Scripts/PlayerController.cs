@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -22,16 +23,36 @@ public class PlayerController : MonoBehaviour
     public float ChargeRatio => chargeTimer / maxChargeTime;
     public bool IsCharging => isCharging;
 
+    [Header("蓄力震动")]
+    public Transform spriteRoot;             // 拖入 Sprite 子物体
+    public float shakeIntensity = 0.05f;
+
+    [Header("放屁跳跃")]
+    public float fartJumpForce = 5f;        // 最小跳跃力
+    public float fartJumpMaxForce = 15f;    // 最大跳跃力
+
+    [Header("地面检测")]
+    public Transform groundCheck;           // 脚底空子物体
+    public LayerMask groundLayer;
+    public float groundCheckRadius = 0.1f;
+
+    private bool isGrounded = false;
+    private bool waitingToLand = false;     // 放屁跳跃后等待落地
+
     void Start()
     {
-        animator = GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody2D>();
     }
 
     void Update()
     {
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+
         HandleMovement();
         HandleFart();
+        HandleShake();
+        HandleLanding();
     }
 
     void HandleMovement()
@@ -53,13 +74,44 @@ public class PlayerController : MonoBehaviour
             transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
     }
 
+    void HandleLanding()
+    {
+        if (!waitingToLand) return;
+
+        if (isGrounded)
+        {
+            waitingToLand = false;
+            isLocked = false;
+            animator.SetBool("IsCharging", false);  // 落地后才关掉
+            animator.Play("Idle", 0, 0f);
+        }
+    }
+
+    void HandleShake()
+    {
+        if (spriteRoot == null) return;
+
+        if (!isCharging)
+        {
+            spriteRoot.localPosition = Vector3.zero;
+            return;
+        }
+
+        float intensity = shakeIntensity * ChargeRatio;
+        spriteRoot.localPosition = new Vector3(
+            Random.Range(-intensity, intensity),
+            Random.Range(-intensity, intensity),
+            0f
+        );
+    }
+
     void HandleFart()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
             isCharging = true;
-            // 删掉了 isLocked = true
             chargeTimer = 0f;
+            animator.SetBool("IsCharging", true);   // 开始蓄力动画
         }
 
         if (isCharging)
@@ -67,25 +119,27 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyUp(KeyCode.Space))
         {
+            // 删掉这行 animator.SetBool("IsCharging", false);
             animator.SetTrigger("Fart");
             SpawnFart(ChargeRatio);
+
+            float jumpForce = Mathf.Lerp(fartJumpForce, fartJumpMaxForce, ChargeRatio);
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
+            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+
             isCharging = false;
             chargeTimer = 0f;
-            isLocked = true;                    // 松开时才锁定
+            isLocked = true;
             StartCoroutine(UnlockAfterFart());
         }
     }
 
     System.Collections.IEnumerator UnlockAfterFart()
     {
-        // 等一帧让 Animator 切换到 Fart 状态
         yield return null;
-
         AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
-        float waitTime = state.length;
-        yield return new WaitForSeconds(waitTime);
-
-        isLocked = false;
+        yield return new WaitForSeconds(state.length);
+        waitingToLand = true;
     }
 
     void SpawnFart(float chargeRatio)
