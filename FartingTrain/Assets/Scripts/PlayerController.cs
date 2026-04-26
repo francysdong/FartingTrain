@@ -52,7 +52,6 @@ public class PlayerController : MonoBehaviour
         HandleMovement();
         HandleFart();
         HandleShake();
-        HandleLanding();
     }
 
     void HandleMovement()
@@ -78,12 +77,13 @@ public class PlayerController : MonoBehaviour
     {
         if (!waitingToLand) return;
 
+        Debug.Log($"waitingToLand: true, isGrounded: {isGrounded}");
+
         if (isGrounded)
         {
             waitingToLand = false;
             isLocked = false;
             animator.SetBool("IsCharging", false);  // 落地后才关掉
-            animator.Play("Idle", 0, 0f);
         }
     }
 
@@ -112,6 +112,7 @@ public class PlayerController : MonoBehaviour
             isCharging = true;
             chargeTimer = 0f;
             animator.SetBool("IsCharging", true);   // 开始蓄力动画
+            animator.Play("Idle", 0, 0f);
         }
 
         if (isCharging)
@@ -137,9 +138,7 @@ public class PlayerController : MonoBehaviour
     System.Collections.IEnumerator UnlockAfterFart()
     {
         yield return null;
-        AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
-        yield return new WaitForSeconds(state.length);
-        waitingToLand = true;
+        waitingToLand = true;  // 不等动画，立刻开始检测落地
     }
 
     void SpawnFart(float chargeRatio)
@@ -155,4 +154,30 @@ public class PlayerController : MonoBehaviour
         if (effect != null)
             effect.ApplyCharge(chargeRatio, direction);  // 传入 direction
     }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+
+        Debug.Log($"碰撞到: {collision.gameObject.name}, layer: {collision.gameObject.layer}, waitingToLand: {waitingToLand}");
+        if (!waitingToLand) return;
+
+        
+
+        // 检查是否是从上方落到地面
+        if (((1 << collision.gameObject.layer) & groundLayer) == 0) return;
+
+        // 确认是从上方碰撞（不是撞墙）
+        foreach (ContactPoint2D contact in collision.contacts)
+        {
+            if (contact.normal.y > 0.5f)
+            {
+                waitingToLand = false;
+                isLocked = false;
+                animator.SetBool("IsCharging", false);
+                animator.Play("Idle", 0, 0f);
+                return;
+            }
+        }
+    }
+
 }
