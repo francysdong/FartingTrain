@@ -16,6 +16,8 @@ public class NPCController : MonoBehaviour
     private int currentReactionLevel = 0;
     private bool isInContact = false;
 
+    private bool isExploded = false;  
+
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -45,12 +47,6 @@ public class NPCController : MonoBehaviour
         }
     }
 
-    public void OnFartLeave()
-    {
-        isInContact = false;
-        currentReactionLevel = 0;
-        animator.Play("Idle", 0, 0f);   // 屁离开时才回 Idle
-    }
 
     int GetLevel(float size)
     {
@@ -68,5 +64,22 @@ public class NPCController : MonoBehaviour
 
         // 通知 InnocentManager 扣除清白值
         InnocentManager.Instance?.Deduct(level);
+    }
+
+    public void OnBigFartExplosion()
+    {
+        isExploded = true;
+        currentReactionLevel = 3;
+        lastReactionTime = Time.time;
+        animator.Play("ReactLarge", 0, 0f);
+    }
+
+    public void OnFartLeave()
+    {
+        if (isExploded) return;   // 宇宙大屁后忽略所有离开事件
+
+        isInContact = false;
+        currentReactionLevel = 0;
+        animator.Play("Idle", 0, 0f);
     }
 }

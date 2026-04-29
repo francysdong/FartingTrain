@@ -15,6 +15,11 @@ public class UIManager : MonoBehaviour
 
     private PlayerController player;
 
+    [Header("蓄屁条")]
+    public Image gasFillBar;
+    public Gradient gasGradient;            // 绿→黄→红
+
+    
     void Awake()
     {
         if (Instance == null) Instance = this;
@@ -25,9 +30,16 @@ public class UIManager : MonoBehaviour
     {
         player = FindObjectOfType<PlayerController>();
         InnocentManager.Instance.onInnocenceChanged.AddListener(UpdateInnocenceBar);
+        GasManager.Instance.onGasChanged.AddListener(UpdateGasBar);  // 新增
 
-        // 初始化清白值条
         UpdateInnocenceBar(1f);
+        UpdateGasBar(0f);                   // 初始蓄屁为空
+    }
+
+    void UpdateGasBar(float ratio)
+    {
+        gasFillBar.fillAmount = ratio;
+        gasFillBar.color = gasGradient.Evaluate(ratio);
     }
 
     void Update()

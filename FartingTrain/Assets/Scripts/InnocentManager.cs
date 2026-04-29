@@ -35,7 +35,14 @@ public class InnocentManager : MonoBehaviour
         currentInnocence = Mathf.Clamp(currentInnocence - amount, 0f, maxInnocence);
         onInnocenceChanged?.Invoke(currentInnocence / maxInnocence);
 
+
         if (currentInnocence <= 0f)
-            Debug.Log("清白值归零！");  // 之后可以在这里触发 Game Over
+            GameOverManager.Instance.TriggerGameOver();  // 默认 false
+    }
+
+    public void SetInnocenceToZero()
+    {
+        currentInnocence = 0f;
+        onInnocenceChanged?.Invoke(0f);
     }
 }

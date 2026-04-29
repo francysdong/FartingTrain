@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
@@ -38,6 +39,7 @@ public class PlayerController : MonoBehaviour
 
     private bool isGrounded = false;
     private bool waitingToLand = false;     // 放屁跳跃后等待落地
+    private bool isFarting = false;     // 只用来锁移动，替代 isLocked
 
     void Start()
     {
@@ -49,6 +51,14 @@ public class PlayerController : MonoBehaviour
     {
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
+        // 最先处理蓄力输入，不受任何锁定影响
+        if (Input.GetKeyDown(KeyCode.Space) && !isCharging)
+        {
+            isCharging = true;
+            chargeTimer = 0f;
+            animator.SetBool("IsCharging", true);
+        }
+
         HandleMovement();
         HandleFart();
         HandleShake();
@@ -56,7 +66,8 @@ public class PlayerController : MonoBehaviour
 
     void HandleMovement()
     {
-        if (isLocked)
+
+        if (isFarting)
         {
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             animator.SetBool("IsWalking", false);
@@ -107,20 +118,13 @@ public class PlayerController : MonoBehaviour
 
     void HandleFart()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            isCharging = true;
-            chargeTimer = 0f;
-            animator.SetBool("IsCharging", true);   // 开始蓄力动画
-            animator.Play("Idle", 0, 0f);
-        }
 
         if (isCharging)
             chargeTimer = Mathf.Clamp(chargeTimer + Time.deltaTime, 0f, maxChargeTime);
 
         if (Input.GetKeyUp(KeyCode.Space))
         {
-            // 删掉这行 animator.SetBool("IsCharging", false);
+            animator.SetBool("IsCharging", false);
             animator.SetTrigger("Fart");
             SpawnFart(ChargeRatio);
 
@@ -130,10 +134,14 @@ public class PlayerController : MonoBehaviour
 
             isCharging = false;
             chargeTimer = 0f;
-            isLocked = true;
-            StartCoroutine(UnlockAfterFart());
+            isFarting = true;
+            waitingToLand = true;
+
         }
+
     }
+
+
 
     System.Collections.IEnumerator UnlockAfterFart()
     {
@@ -145,36 +153,37 @@ public class PlayerController : MonoBehaviour
     {
         if (fartPrefab == null) return;
 
-        float direction = transform.localScale.x > 0 ? 1f : -1f;  // 正负对调
+        float direction = transform.localScale.x > 0 ? 1f : -1f;
         Vector2 spawnPos = (Vector2)transform.position + new Vector2(fartOffset.x * direction, fartOffset.y);
 
         GameObject fart = Instantiate(fartPrefab, spawnPos, Quaternion.identity);
 
         FartEffect effect = fart.GetComponent<FartEffect>();
         if (effect != null)
-            effect.ApplyCharge(chargeRatio, direction);  // 传入 direction
+            effect.ApplyCharge(chargeRatio, direction);
+
+        // chargeRatio 0~1 直接映射减少量
+        float deduction = GasManager.Instance.maxGas * chargeRatio * GasManager.Instance.maxFartDeductionRatio;
+        GasManager.Instance.DeductGas(deduction);
     }
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-
-        Debug.Log($"碰撞到: {collision.gameObject.name}, layer: {collision.gameObject.layer}, waitingToLand: {waitingToLand}");
         if (!waitingToLand) return;
-
-        
-
-        // 检查是否是从上方落到地面
         if (((1 << collision.gameObject.layer) & groundLayer) == 0) return;
 
-        // 确认是从上方碰撞（不是撞墙）
         foreach (ContactPoint2D contact in collision.contacts)
         {
             if (contact.normal.y > 0.5f)
             {
                 waitingToLand = false;
-                isLocked = false;
-                animator.SetBool("IsCharging", false);
-                animator.Play("Idle", 0, 0f);
+                isFarting = false;
+
+                if (isCharging)
+                    animator.SetBool("IsCharging", true);   // 落地前已按空格
+                else
+                    animator.Play("Idle", 0, 0f);           // 正常落地回 Idle
+
                 return;
             }
         }
