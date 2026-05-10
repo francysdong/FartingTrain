@@ -13,13 +13,17 @@ public class UIManager : MonoBehaviour
     public Image innocenceFillBar;
     public Gradient innocenceGradient;
 
-    private PlayerController player;
-
     [Header("蓄屁条")]
     public Image gasFillBar;
-    public Gradient gasGradient;            // 绿→黄→红
+    public Gradient gasGradient;
 
-    
+    [Header("行驶进度指针")]
+    public RectTransform progressPointer;    // 拖入指针的 RectTransform
+    public float pointerMinX = -300f;        // 最左边的位置（起点）
+    public float pointerMaxX = 300f;         // 最右边的位置（终点）
+
+    private PlayerController player;
+
     void Awake()
     {
         if (Instance == null) Instance = this;
@@ -30,22 +34,23 @@ public class UIManager : MonoBehaviour
     {
         player = FindObjectOfType<PlayerController>();
         InnocentManager.Instance.onInnocenceChanged.AddListener(UpdateInnocenceBar);
-        GasManager.Instance.onGasChanged.AddListener(UpdateGasBar);  // 新增
+        GasManager.Instance.onGasChanged.AddListener(UpdateGasBar);
 
         UpdateInnocenceBar(1f);
-        UpdateGasBar(0f);                   // 初始蓄屁为空
-    }
-
-    void UpdateGasBar(float ratio)
-    {
-        gasFillBar.fillAmount = ratio;
-        gasFillBar.color = gasGradient.Evaluate(ratio);
+        UpdateGasBar(0f);
     }
 
     void Update()
     {
-        if (player == null) return;
-        UpdateChargeBar(player.ChargeRatio);
+        if (player != null)
+            UpdateChargeBar(player.ChargeRatio);
+
+        if (TrainManager.Instance != null && progressPointer != null)
+        {
+            float progress = TrainManager.Instance.Progress;
+            float targetX = Mathf.Lerp(pointerMinX, pointerMaxX, progress);
+            progressPointer.anchoredPosition = new Vector2(targetX, progressPointer.anchoredPosition.y);
+        }
     }
 
     void UpdateChargeBar(float ratio)
@@ -58,5 +63,11 @@ public class UIManager : MonoBehaviour
     {
         innocenceFillBar.fillAmount = ratio;
         innocenceFillBar.color = innocenceGradient.Evaluate(ratio);
+    }
+
+    void UpdateGasBar(float ratio)
+    {
+        gasFillBar.fillAmount = ratio;
+        gasFillBar.color = gasGradient.Evaluate(ratio);
     }
 }

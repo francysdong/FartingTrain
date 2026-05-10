@@ -1,15 +1,17 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Collections;
 
-public class GameOverManager : MonoBehaviour
+public class GameStateManager : MonoBehaviour
 {
-    public static GameOverManager Instance { get; private set; }
+    public static GameStateManager Instance { get; private set; }
 
     [Header("UI")]
-    public GameObject gameOverPanel;        // 拖入 GameOver Panel
+    public GameObject gameOverPanel;
+    public GameObject winPanel;
 
     private bool isGameOver = false;
+    private bool isWin = false;
 
     void Awake()
     {
@@ -20,7 +22,10 @@ public class GameOverManager : MonoBehaviour
     void Start()
     {
         gameOverPanel.SetActive(false);
+        winPanel.SetActive(false);
+
         InnocentManager.Instance.onInnocenceChanged.AddListener(CheckGameOver);
+        TrainManager.Instance.onArrived.AddListener(TriggerWin);
     }
 
     void CheckGameOver(float ratio)
@@ -31,7 +36,7 @@ public class GameOverManager : MonoBehaviour
 
     public void TriggerGameOver(bool isExplosion = false)
     {
-        if (isGameOver) return;
+        if (isGameOver || isWin) return;
         isGameOver = true;
 
         PlayerController player = FindObjectOfType<PlayerController>();
@@ -42,17 +47,15 @@ public class GameOverManager : MonoBehaviour
 
         if (isExplosion)
         {
-            // 宇宙大屁：全场所有 NPC
             foreach (NPCController npc in allNPCs)
                 npc.OnBigFartExplosion();
         }
         else
         {
-            // 普通 Game Over：周围范围内 NPC
             float range = 5f;
             foreach (NPCController npc in allNPCs)
             {
-                if (Vector3.Distance(npc.transform.position, player.transform.position) <= range)
+                if (player != null && Vector3.Distance(npc.transform.position, player.transform.position) <= range)
                     npc.OnBigFartExplosion();
             }
         }
@@ -62,10 +65,21 @@ public class GameOverManager : MonoBehaviour
 
     IEnumerator GameOverSequence()
     {
-        // 等待 NPC 动画和清白条反应
         yield return new WaitForSeconds(1.5f);
-
         gameOverPanel.SetActive(true);
+    }
+
+    public void TriggerWin()
+    {
+        if (isGameOver || isWin) return;
+        isWin = true;
+
+        PlayerController player = FindObjectOfType<PlayerController>();
+        if (player != null)
+            player.enabled = false;
+
+        TrainManager.Instance.StopTrain();
+        winPanel.SetActive(true);
     }
 
     public void RetryLevel()
@@ -75,6 +89,11 @@ public class GameOverManager : MonoBehaviour
 
     public void GoToLevelSelect()
     {
-        SceneManager.LoadScene("LevelSelect");
+        SceneLoader.Instance.LoadLevelSelect();
+    }
+
+    public void NextLevel()
+    {
+        SceneLoader.Instance.LoadLevelSelect();
     }
 }

@@ -37,7 +37,7 @@ public class InnocentManager : MonoBehaviour
 
 
         if (currentInnocence <= 0f)
-            GameOverManager.Instance.TriggerGameOver();  // д╛хо false
+            GameStateManager.Instance.TriggerGameOver();  // д╛хо false
     }
 
     public void SetInnocenceToZero()

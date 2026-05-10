@@ -27,7 +27,7 @@ public class FartExplosion : MonoBehaviour
 
         // 直接清空清白值
         InnocentManager.Instance.SetInnocenceToZero();
-        GameOverManager.Instance.TriggerGameOver(true);  // 宇宙大屁
+        GameStateManager.Instance.TriggerGameOver(true);  // 宇宙大屁
 
         GasManager.Instance.ResetExplosion();
     }
