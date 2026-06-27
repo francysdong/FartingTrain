@@ -36,11 +36,11 @@ public class NPCController : MonoBehaviour
 
 
     // ─── 动画名常量（对应你的文件名）──────────────────────────
-    const string ANIM_IDLE = "npc_0_idle";
-    const string ANIM_ALERT = "npc_0_notice_S";   // 循环动画
-    const string ANIM_SUSPICIOUS = "npc_0_notice_M";
-    const string ANIM_CONFIRM_R = "npc_0_notice_L";           // 玩家在右边
-    const string ANIM_CONFIRM_L = "npc_0_notice_L_reversed";  // 玩家在左边
+    const string ANIM_IDLE = "idle";
+    const string ANIM_ALERT = "notice_S";   // 循环动画
+    const string ANIM_SUSPICIOUS = "notice_M";
+    const string ANIM_CONFIRM_R = "notice_L";           // 玩家在右边
+    const string ANIM_CONFIRM_L = "notice_L_reversed";  // 玩家在左边
 
 
     void Start()
