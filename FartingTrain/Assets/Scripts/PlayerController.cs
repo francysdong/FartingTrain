@@ -148,8 +148,13 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyUp(KeyCode.Space))
         {
+
+            float ratio = ChargeRatio;
+
             PlayFartForCurrentState();
             SpawnFart(ChargeRatio);
+
+            FartSoundManager.Instance?.PlayFartSound(ratio); 
 
             if (currentGasState != GasState.Hard)
             {
