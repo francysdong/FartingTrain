@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class UIManager : MonoBehaviour
 {
@@ -9,9 +10,29 @@ public class UIManager : MonoBehaviour
     public Image chargeFillBar;
     public Gradient chargeGradient;
 
-    [Header("清白值条")]
-    public Image innocenceFillBar;
-    public Gradient innocenceGradient;
+    [Header("社死头像")]
+    public Image avatarBackground;
+    public Image avatarBackground2;
+    public Image avatarFill;
+
+    [Header("高社死值 (正常)")]
+    public Sprite bgNormal;
+    public Sprite bg2Normal;
+    public Sprite fillNormal;
+
+    [Header("中社死值")]
+    public Sprite bgWorried;
+    public Sprite bg2Worried;
+    public Sprite fillWorried;
+
+    [Header("低社死值")]
+    public Sprite bgDead;
+    public Sprite bg2Dead;
+    public Sprite fillDead;
+
+    [Header("切换阈值")]
+    public float worriedThreshold = 0.6f;
+    public float deadThreshold = 0.3f;
 
     [Header("蓄屁条")]
     public Image gasFillBar;
@@ -21,6 +42,10 @@ public class UIManager : MonoBehaviour
     public RectTransform progressPointer;    // 拖入指针的 RectTransform
     public float pointerMinX = -300f;        // 最左边的位置（起点）
     public float pointerMaxX = 300f;         // 最右边的位置（终点）
+
+    [Header("放屁按钮")]
+    public RectTransform fartButton;
+    public float buttonPressScale = 0.85f;
 
     private PlayerController player;
 
@@ -61,13 +86,62 @@ public class UIManager : MonoBehaviour
 
     void UpdateInnocenceBar(float ratio)
     {
-        innocenceFillBar.fillAmount = ratio;
-        innocenceFillBar.color = innocenceGradient.Evaluate(ratio);
+        // fill 水位
+        avatarFill.fillAmount = ratio;
+
+        // 图片切换
+        Sprite bg, bg2, fill;
+        if (ratio < deadThreshold)
+        {
+            bg = bgDead; bg2 = bg2Dead; fill = fillDead;
+        }
+        else if (ratio < worriedThreshold)
+        {
+            bg = bgWorried; bg2 = bg2Worried; fill = fillWorried;
+        }
+        else
+        {
+            bg = bgNormal; bg2 = bg2Normal; fill = fillNormal;
+        }
+
+        avatarBackground.sprite = bg;
+        avatarBackground2.sprite = bg2;
+        avatarFill.sprite = fill;
     }
 
     void UpdateGasBar(float ratio)
     {
         gasFillBar.fillAmount = ratio;
         gasFillBar.color = gasGradient.Evaluate(ratio);
+    }
+
+
+
+    public void OnFartButtonDown()
+    {
+        PlayerController.Instance?.OnFartButtonDown();
+        StartCoroutine(ScaleButton(buttonPressScale, 0.08f));
+    }
+
+    public void OnFartButtonUp()
+    {
+        PlayerController.Instance?.OnFartButtonUp();
+        StartCoroutine(ScaleButton(1f, 0.12f));
+    }
+
+    IEnumerator ScaleButton(float targetScale, float duration)
+    {
+        Vector3 startScale = fartButton.localScale;
+        Vector3 endScale = Vector3.one * targetScale;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            fartButton.localScale = Vector3.Lerp(startScale, endScale, elapsed / duration);
+            yield return null;
+        }
+
+        fartButton.localScale = endScale;
     }
 }

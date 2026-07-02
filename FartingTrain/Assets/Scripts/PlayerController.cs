@@ -45,6 +45,9 @@ public class PlayerController : MonoBehaviour
     private bool waitingToLand = false;
     private bool isFarting = false;
 
+    private bool fartButtonDown = false;
+    private bool fartButtonUp = false;
+
     // ─── 状态枚举 ────────────────────────────────────────────
     enum GasState { Normal, Medium, Hard }
     GasState currentGasState = GasState.Normal;
@@ -63,6 +66,14 @@ public class PlayerController : MonoBehaviour
     const string ANIM_HARD_IDLE = "shizu_idle_hard";
     const string ANIM_HARD_WALK = "shizu_walk_hard";
     const string ANIM_HARD_FART = "shizu_fart_hard";
+
+    public static PlayerController Instance { get; private set; }
+
+    void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
 
     void Start()
     {
@@ -143,25 +154,34 @@ public class PlayerController : MonoBehaviour
 
     void HandleFart()
     {
+        bool pressDown = Input.GetKeyDown(KeyCode.Space) || fartButtonDown;
+        bool pressUp = Input.GetKeyUp(KeyCode.Space) || fartButtonUp;
+
+        fartButtonDown = false;
+        fartButtonUp = false;
+
+        if (pressDown && !isCharging)
+        {
+            isCharging = true;
+            chargeTimer = 0f;
+            animator.Play(ANIM_NORMAL_HOLD, 0, 0f);
+        }
+
         if (isCharging)
             chargeTimer = Mathf.Clamp(chargeTimer + Time.deltaTime, 0f, maxChargeTime);
 
-        if (Input.GetKeyUp(KeyCode.Space))
+        if (pressUp && isCharging)
         {
-
             float ratio = ChargeRatio;
-
             PlayFartForCurrentState();
-            SpawnFart(ChargeRatio);
-
-            FartSoundManager.Instance?.PlayFartSound(ratio); 
+            SpawnFart(ratio);
+            FartSoundManager.Instance?.PlayFartSound(ratio);
 
             if (currentGasState != GasState.Hard)
             {
-                float jumpForce = Mathf.Lerp(fartJumpForce, fartJumpMaxForce, ChargeRatio);
+                float jumpForce = Mathf.Lerp(fartJumpForce, fartJumpMaxForce, ratio);
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
                 rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-
                 isCharging = false;
                 chargeTimer = 0f;
                 isFarting = true;
@@ -169,10 +189,9 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                // Hard 不跳，放完屁直接等动画播完再回 idle
                 isCharging = false;
                 chargeTimer = 0f;
-                isFarting = true;  
+                isFarting = true;
                 StartCoroutine(HardFartFinish());
             }
         }
@@ -237,6 +256,9 @@ public class PlayerController : MonoBehaviour
         isFarting = false;
         PlayIdleForCurrentState();
     }
+
+    public void OnFartButtonDown() => fartButtonDown = true;
+    public void OnFartButtonUp() => fartButtonUp = true;
 
     // ─── 动画工具方法 ─────────────────────────────────────────
     void PlayIdleForCurrentState()
