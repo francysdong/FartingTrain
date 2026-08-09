@@ -4,6 +4,7 @@ using System.Collections;
 public class NPCController : MonoBehaviour
 {
     public enum NPCState { Relaxed, Alert, Suspicious, Confirmed }
+    public enum PassengerState { OnBoard, MovingToExit, Exited }
 
     [Header("反应阈值（屁的大小）")]
     public float smallThreshold = 0.3f;
@@ -19,7 +20,12 @@ public class NPCController : MonoBehaviour
     [Header("接触冷却")]
     public float reactionCooldown = 0.8f;
 
+    [Header("下车设置")]
+    public float exitLeadTime = 0f;
+    public float walkSpeed = 2f;
+
     private NPCState currentState = NPCState.Relaxed;
+    private PassengerState passengerState = PassengerState.OnBoard;
     private float suspicion = 0f;
     private float alertTimer = 0f;
     private bool isInContact = false;
@@ -41,6 +47,7 @@ public class NPCController : MonoBehaviour
     const string ANIM_SUSPICIOUS = "notice_M";
     const string ANIM_CONFIRM_R = "notice_L";           // 玩家在右边
     const string ANIM_CONFIRM_L = "notice_L_reversed";  // 玩家在左边
+    const string ANIM_WALK = "walk";
 
 
     void Start()
@@ -200,6 +207,40 @@ public class NPCController : MonoBehaviour
         animator.Play(confirmAnim, 0, 0f);
     }
 
+    // ---- 下车逻辑（由 TrainManager 到站广播触发） ----
+    public void BeginExit(Transform doorTarget)
+    {
+        if (passengerState != PassengerState.OnBoard) return;
+        StartCoroutine(ExitRoutine(doorTarget));
+    }
+
+    IEnumerator ExitRoutine(Transform doorTarget)
+    {
+        yield return new WaitForSeconds(exitLeadTime);
+
+        passengerState = PassengerState.MovingToExit;
+        float dir = doorTarget.position.x - transform.position.x;
+        transform.localScale = new Vector3(
+            dir > 0 ? Mathf.Abs(transform.localScale.x) : -Mathf.Abs(transform.localScale.x),
+            transform.localScale.y, transform.localScale.z);
+
+        while (Vector3.Distance(transform.position, doorTarget.position) > 0.05f)
+        {
+            if (currentState == NPCState.Relaxed)
+            {
+                if (!IsPlaying(ANIM_WALK)) animator.Play(ANIM_WALK, 0, 0f);
+                transform.position = Vector3.MoveTowards(transform.position, doorTarget.position, walkSpeed * Time.deltaTime);
+            }
+            yield return null;
+        }
+
+        if (currentState == NPCState.Relaxed) animator.Play(ANIM_IDLE, 0, 0f);
+        yield return new WaitUntil(() => TrainManager.Instance != null && TrainManager.Instance.HasArrived);
+
+        passengerState = PassengerState.Exited;
+        gameObject.SetActive(false);
+    }
+
     // ─── 工具方法 ─────────────────────────────────────────────
     bool IsPlayerOnRight()
     {
@@ -207,6 +248,11 @@ public class NPCController : MonoBehaviour
         bool result = playerTransform.position.x > transform.position.x;
         Debug.Log($"Player x: {playerTransform.position.x}, NPC x: {transform.position.x}, IsRight: {result}");
         return result;
+    }
+
+    bool IsPlaying(string animName)
+    {
+        return animator.GetCurrentAnimatorStateInfo(0).IsName(animName);
     }
 
     int GetLevel(float size)
