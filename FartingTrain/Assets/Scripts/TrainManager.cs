@@ -13,13 +13,13 @@ public class TrainManager : MonoBehaviour
 {
     public static TrainManager Instance { get; private set; }
 
-    [Header("ĞĞÊ»ÉèÖÃ")]
+    [Header("è¡Œé©¶è®¾ç½®")]
     public float tripDuration = 60f;
     public bool isMoving = true;
 
     public UnityEvent onArrived;
 
-    [Header("µ½Õ¾ÅäÖÃ")]
+    [Header("åˆ°ç«™é…ç½®")]
     public List<StationExitEntry> exitingNpcs = new List<StationExitEntry>();
     public float approachLeadTime = 5f;
     public UnityEvent onApproachingStation;

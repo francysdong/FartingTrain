@@ -4,7 +4,7 @@ using TMPro;
 
 public class LevelSelectUI : MonoBehaviour
 {
-    [Header("¹Ø¿¨°´Å¥")]
+    [Header("å…³å¡æŒ‰é’®")]
     public Button[] levelButtons;
     public int unlockedLevels = 1;
 
@@ -17,7 +17,7 @@ public class LevelSelectUI : MonoBehaviour
 
             levelButtons[i].interactable = isUnlocked;
 
-            // Ö»¸ÄËø¶¨µÄ°´Å¥ÑÕÉ«£¬½âËøµÄ±£³ÖÔ­Ñù
+            // åªæ”¹é”å®šçš„æŒ‰é’®é¢œè‰²ï¼Œè§£é”çš„ä¿æŒåŸæ ·
             if (!isUnlocked)
             {
                 TextMeshProUGUI buttonText = levelButtons[i].GetComponentInChildren<TextMeshProUGUI>();

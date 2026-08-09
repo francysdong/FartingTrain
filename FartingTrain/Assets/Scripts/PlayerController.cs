@@ -6,21 +6,21 @@ public class PlayerController : MonoBehaviour
     private Animator animator;
     private Rigidbody2D rb;
 
-    [Header("ÒÆ¶¯²ÎÊý")]
+    [Header("ç§»åŠ¨å‚æ•°")]
     public float moveSpeed = 5f;
-    public float mediumSpeedMultiplier = 0.7f;  // ÖÐµÈ×´Ì¬ËÙ¶È±¶ÂÊ
-    public float hardSpeedMultiplier = 0.4f;  // ±ï²»×¡ËÙ¶È±¶ÂÊ
+    public float mediumSpeedMultiplier = 0.7f;  // ä¸­ç­‰çŠ¶æ€é€Ÿåº¦å€çŽ‡
+    public float hardSpeedMultiplier = 0.4f;  // æ†‹ä¸ä½é€Ÿåº¦å€çŽ‡
 
-    [Header("·ÅÆ¨²ÎÊý")]
+    [Header("æ”¾å±å‚æ•°")]
     public GameObject fartPrefab;
     public Vector2 fartOffset = new Vector2(-0.5f, 0f);
 
-    [Header("ÐîÆø²ÎÊý")]
+    [Header("è“„æ°”å‚æ•°")]
     public float maxChargeTime = 2f;
 
-    [Header("ÆøÁ¿ãÐÖµ")]
-    public float mediumThreshold = 0.4f;  // ³¬¹ý´ËÖµ½øÈë Medium
-    public float hardThreshold = 0.7f;  // ³¬¹ý´ËÖµ½øÈë Hard
+    [Header("æ°”é‡é˜ˆå€¼")]
+    public float mediumThreshold = 0.4f;  // è¶…è¿‡æ­¤å€¼è¿›å…¥ Medium
+    public float hardThreshold = 0.7f;  // è¶…è¿‡æ­¤å€¼è¿›å…¥ Hard
 
     private float chargeTimer = 0f;
     private bool isCharging = false;
@@ -28,15 +28,15 @@ public class PlayerController : MonoBehaviour
     public float ChargeRatio => chargeTimer / maxChargeTime;
     public bool IsCharging => isCharging;
 
-    [Header("Õð¶¯")]
+    [Header("éœ‡åŠ¨")]
     public Transform spriteRoot;
     public float shakeIntensity = 0.05f;
 
-    [Header("·ÅÆ¨ÌøÔ¾")]
+    [Header("æ”¾å±è·³è·ƒ")]
     public float fartJumpForce = 5f;
     public float fartJumpMaxForce = 15f;
 
-    [Header("ÂäµØ¼ì²â")]
+    [Header("è½åœ°æ£€æµ‹")]
     public Transform groundCheck;
     public LayerMask groundLayer;
     public float groundCheckRadius = 0.1f;
@@ -48,12 +48,12 @@ public class PlayerController : MonoBehaviour
     private bool fartButtonDown = false;
     private bool fartButtonUp = false;
 
-    // ©¤©¤©¤ ×´Ì¬Ã¶¾Ù ©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤
+    // â”€â”€â”€ çŠ¶æ€æžšä¸¾ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     enum GasState { Normal, Medium, Hard }
     GasState currentGasState = GasState.Normal;
 
-    // ©¤©¤©¤ ¶¯»­Ãû³£Á¿ ©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤
-    // Normal ÓÃÔ­ÓÐ Animator ²ÎÊý¿ØÖÆ£¬²»ÐèÒª³£Á¿
+    // â”€â”€â”€ åŠ¨ç”»åå¸¸é‡ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // Normal ç”¨åŽŸæœ‰ Animator å‚æ•°æŽ§åˆ¶ï¼Œä¸éœ€è¦å¸¸é‡
     const string ANIM_NORMAL_IDLE = "shizu_idle";
     const string ANIM_NORMAL_WALK = "shizu_walk";
     const string ANIM_NORMAL_FART = "shizu_fart";
@@ -113,7 +113,7 @@ public class PlayerController : MonoBehaviour
         if (newState != currentGasState)
         {
             currentGasState = newState;
-            animator.SetInteger("GasState", (int)newState); // Í¬²½¸ø Animator
+            animator.SetInteger("GasState", (int)newState); // åŒæ­¥ç»™ Animator
             if (!isFarting && !isCharging)
                 PlayIdleForCurrentState();
         }
@@ -123,11 +123,11 @@ public class PlayerController : MonoBehaviour
     {
         float input = Input.GetAxisRaw("Horizontal");
 
-        // ³¯Ïò
+        // æœå‘
         if (input > 0) transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         else if (input < 0) transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
 
-        // ËÙ¶È
+        // é€Ÿåº¦
         if (isFarting)
         {
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
@@ -143,7 +143,7 @@ public class PlayerController : MonoBehaviour
             rb.linearVelocity = new Vector2(input * speed, rb.linearVelocity.y);
         }
 
-        // ¶¯»­£¨ÐîÆøºÍ·ÅÆ¨Ê±²»ÇÐ»»£©
+        // åŠ¨ç”»ï¼ˆè“„æ°”å’Œæ”¾å±æ—¶ä¸åˆ‡æ¢ï¼‰
         if (isCharging || isFarting) return;
 
         if (input != 0)
@@ -249,8 +249,8 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator HardFartFinish()
     {
-        yield return null;  // µÈ Play Ö¸ÁîÉúÐ§
-        yield return null;  // ÔÙµÈÒ»Ö¡È·±£ÒÑÇÐ»»µ½ fart ¶¯»­
+        yield return null;  // ç­‰ Play æŒ‡ä»¤ç”Ÿæ•ˆ
+        yield return null;  // å†ç­‰ä¸€å¸§ç¡®ä¿å·²åˆ‡æ¢åˆ° fart åŠ¨ç”»
         float clipLength = animator.GetCurrentAnimatorStateInfo(0).length;
         yield return new WaitForSeconds(clipLength);
         isFarting = false;
@@ -260,7 +260,7 @@ public class PlayerController : MonoBehaviour
     public void OnFartButtonDown() => fartButtonDown = true;
     public void OnFartButtonUp() => fartButtonUp = true;
 
-    // ©¤©¤©¤ ¶¯»­¹¤¾ß·½·¨ ©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤
+    // â”€â”€â”€ åŠ¨ç”»å·¥å…·æ–¹æ³• â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     void PlayIdleForCurrentState()
     {
         switch (currentGasState)

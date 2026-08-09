@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class FartExplosion : MonoBehaviour
 {
-    [Header("ÓîÖæ´óÆ¨ÉèÖÃ")]
-    public GameObject explosionFartPrefab;  // ¿ÉÒÔÓÃ´óÒ»µãµÄ FartEffect Prefab
-    public float explosionSize = 10f;       // ¸²¸ÇÈ«ÆÁµÄ´óĞ¡
+    [Header("å®‡å®™å¤§å±è®¾ç½®")]
+    public GameObject explosionFartPrefab;  // å¯ä»¥ç”¨å¤§ä¸€ç‚¹çš„ FartEffect Prefab
+    public float explosionSize = 10f;       // è¦†ç›–å…¨å±çš„å¤§å°
 
     void Start()
     {
@@ -25,9 +25,9 @@ public class FartExplosion : MonoBehaviour
             explosion.transform.localScale = Vector3.one * explosionSize;
         }
 
-        // Ö±½ÓÇå¿ÕÇå°×Öµ
+        // ç›´æ¥æ¸…ç©ºæ¸…ç™½å€¼
         InnocentManager.Instance.SetInnocenceToZero();
-        GameStateManager.Instance.TriggerGameOver(true);  // ÓîÖæ´óÆ¨
+        GameStateManager.Instance.TriggerGameOver(true);  // å®‡å®™å¤§å±
 
         GasManager.Instance.ResetExplosion();
     }

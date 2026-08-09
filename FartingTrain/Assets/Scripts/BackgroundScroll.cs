@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class BackgroundScroll : MonoBehaviour
 {
-    [Header("¹ö¶¯ÉèÖÃ")]
+    [Header("æ»šåŠ¨è®¾ç½®")]
     public float scrollSpeed = 2f;
     public float resetX = -20f;
     public float startX = 20f;
 
-    [Header("»Î¶¯ÉèÖÃ")]
+    [Header("æ™ƒåŠ¨è®¾ç½®")]
     public float shakeInterval = 5f;
     public float shakeDuration = 0.5f;
     public float shakeIntensity = 0.1f;
@@ -27,13 +27,13 @@ public class BackgroundScroll : MonoBehaviour
     {
         if (TrainManager.Instance != null && !TrainManager.Instance.isMoving) return;
 
-        // ¹ö¶¯
+        // æ»šåŠ¨
         transform.position += Vector3.left * scrollSpeed * Time.deltaTime;
 
         if (transform.position.x <= resetX)
             transform.position = new Vector3(startX, transform.position.y, transform.position.z);
 
-        // »Î¶¯
+        // æ™ƒåŠ¨
         HandleShake();
     }
 

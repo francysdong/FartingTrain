@@ -4,13 +4,13 @@ public class FartSoundManager : MonoBehaviour
 {
     public static FartSoundManager Instance { get; private set; }
 
-    [Header("Ğ¡Æ¨ÒôĞ§³Ø")]
+    [Header("å°å±éŸ³æ•ˆæ± ")]
     public AudioClip[] smallFartSounds;
 
-    [Header("´óÆ¨ÒôĞ§³Ø")]
+    [Header("å¤§å±éŸ³æ•ˆæ± ")]
     public AudioClip[] bigFartSounds;
 
-    [Header("ãĞÖµ")]
+    [Header("é˜ˆå€¼")]
     [Range(0f, 1f)]
     public float bigFartThreshold = 0.7f;
 

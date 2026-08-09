@@ -29,7 +29,7 @@ public class FartLinger : MonoBehaviour
         timer += Time.deltaTime;
         float progress = timer / lingerDuration;
 
-        // ´óĞ¡ËæÊ±¼äË¥¼õ
+        // å¤§å°éšæ—¶é—´è¡°å‡
         currentSize = Mathf.Lerp(currentSize, 0f, progress);
         col.radius = currentSize * 0.5f;
 

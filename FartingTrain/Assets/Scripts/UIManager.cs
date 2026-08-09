@@ -6,44 +6,44 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager Instance { get; private set; }
 
-    [Header("ĞîÁ¦Ìõ")]
+    [Header("è“„åŠ›æ¡")]
     public Image chargeFillBar;
     public Gradient chargeGradient;
 
-    [Header("ÉçËÀÍ·Ïñ")]
+    [Header("ç¤¾æ­»å¤´åƒ")]
     public Image avatarBackground;
     public Image avatarBackground2;
     public Image avatarFill;
 
-    [Header("¸ßÉçËÀÖµ (Õı³£)")]
+    [Header("é«˜ç¤¾æ­»å€¼ (æ­£å¸¸)")]
     public Sprite bgNormal;
     public Sprite bg2Normal;
     public Sprite fillNormal;
 
-    [Header("ÖĞÉçËÀÖµ")]
+    [Header("ä¸­ç¤¾æ­»å€¼")]
     public Sprite bgWorried;
     public Sprite bg2Worried;
     public Sprite fillWorried;
 
-    [Header("µÍÉçËÀÖµ")]
+    [Header("ä½ç¤¾æ­»å€¼")]
     public Sprite bgDead;
     public Sprite bg2Dead;
     public Sprite fillDead;
 
-    [Header("ÇĞ»»ãĞÖµ")]
+    [Header("åˆ‡æ¢é˜ˆå€¼")]
     public float worriedThreshold = 0.6f;
     public float deadThreshold = 0.3f;
 
-    [Header("ĞîÆ¨Ìõ")]
+    [Header("è“„å±æ¡")]
     public Image gasFillBar;
     public Gradient gasGradient;
 
-    [Header("ĞĞÊ»½ø¶ÈÖ¸Õë")]
-    public RectTransform progressPointer;    // ÍÏÈëÖ¸ÕëµÄ RectTransform
-    public float pointerMinX = -300f;        // ×î×ó±ßµÄÎ»ÖÃ£¨Æğµã£©
-    public float pointerMaxX = 300f;         // ×îÓÒ±ßµÄÎ»ÖÃ£¨ÖÕµã£©
+    [Header("è¡Œé©¶è¿›åº¦æŒ‡é’ˆ")]
+    public RectTransform progressPointer;    // æ‹–å…¥æŒ‡é’ˆçš„ RectTransform
+    public float pointerMinX = -300f;        // æœ€å·¦è¾¹çš„ä½ç½®ï¼ˆèµ·ç‚¹ï¼‰
+    public float pointerMaxX = 300f;         // æœ€å³è¾¹çš„ä½ç½®ï¼ˆç»ˆç‚¹ï¼‰
 
-    [Header("·ÅÆ¨°´Å¥")]
+    [Header("æ”¾å±æŒ‰é’®")]
     public RectTransform fartButton;
     public float buttonPressScale = 0.85f;
 
@@ -86,10 +86,10 @@ public class UIManager : MonoBehaviour
 
     void UpdateInnocenceBar(float ratio)
     {
-        // fill Ë®Î»
+        // fill æ°´ä½
         avatarFill.fillAmount = ratio;
 
-        // Í¼Æ¬ÇĞ»»
+        // å›¾ç‰‡åˆ‡æ¢
         Sprite bg, bg2, fill;
         if (ratio < deadThreshold)
         {

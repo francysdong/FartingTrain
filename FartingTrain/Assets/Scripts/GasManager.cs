@@ -5,23 +5,23 @@ public class GasManager : MonoBehaviour
 {
     public static GasManager Instance { get; private set; }
 
-    [Header("ĞîÆ¨ÉèÖÃ")]
+    [Header("è“„å±è®¾ç½®")]
     public float maxGas = 100f;
     public float currentGas = 0f;
-    public float gasIncreaseRate = 5f;      // Ã¿ÃëÔö¼ÓÁ¿
-    public float fartDeduction = 30f;       // ·ÅÆ¨¼õÉÙÁ¿
-    public float bigFartDeduction = 80f;    // ´óÆ¨¼õÉÙÁ¿
+    public float gasIncreaseRate = 5f;      // æ¯ç§’å¢åŠ é‡
+    public float fartDeduction = 30f;       // æ”¾å±å‡å°‘é‡
+    public float bigFartDeduction = 80f;    // å¤§å±å‡å°‘é‡
 
-    [Header("ÓîÖæ´óÆ¨ãĞÖµ")]
+    [Header("å®‡å®™å¤§å±é˜ˆå€¼")]
     public float explosionThreshold = 100f;
 
     public UnityEvent<float> onGasChanged;
-    public UnityEvent onGasExplosion;       // ´¥·¢ÓîÖæ´óÆ¨
+    public UnityEvent onGasExplosion;       // è§¦å‘å®‡å®™å¤§å±
 
-    [Header("·ÅÆ¨¼õÉÙ±ÈÀı")]
-    public float maxFartDeductionRatio = 0.4f;  // ÂúĞîÁ¦×î¶à¼õÉÙ¼¸³É
+    [Header("æ”¾å±å‡å°‘æ¯”ä¾‹")]
+    public float maxFartDeductionRatio = 0.4f;  // æ»¡è“„åŠ›æœ€å¤šå‡å°‘å‡ æˆ
 
-    private bool hasExploded = false;       // ·ÀÖ¹Á¬Ğø´¥·¢
+    private bool hasExploded = false;       // é˜²æ­¢è¿ç»­è§¦å‘
 
     void Awake()
     {
@@ -51,11 +51,11 @@ public class GasManager : MonoBehaviour
         hasExploded = true;
         currentGas = 0f;
         onGasChanged?.Invoke(0f);
-        onGasExplosion?.Invoke();           // Í¨Öª FartExplosion ´¥·¢
+        onGasExplosion?.Invoke();           // é€šçŸ¥ FartExplosion è§¦å‘
     }
 
     public void ResetExplosion()
     {
-        hasExploded = false;                // ÓîÖæ´óÆ¨½áÊøºóÖØÖÃ
+        hasExploded = false;                // å®‡å®™å¤§å±ç»“æŸåé‡ç½®
     }
 }

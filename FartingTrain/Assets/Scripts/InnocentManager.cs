@@ -5,16 +5,16 @@ public class InnocentManager : MonoBehaviour
 {
     public static InnocentManager Instance { get; private set; }
 
-    [Header("Çå°×ÖµÉèÖÃ")]
+    [Header("æ¸…ç™½å€¼è®¾ç½®")]
     public float maxInnocence = 100f;
     public float currentInnocence = 100f;
 
-    [Header("Ã¿¼¶·´Ó¦¿Û³ıÁ¿")]
+    [Header("æ¯çº§ååº”æ‰£é™¤é‡")]
     public float smallDeduction = 5f;
     public float mediumDeduction = 15f;
     public float largeDeduction = 30f;
 
-    public UnityEvent<float> onInnocenceChanged;   // UI ¼àÌıÓÃ
+    public UnityEvent<float> onInnocenceChanged;   // UI ç›‘å¬ç”¨
 
     void Awake()
     {
@@ -37,7 +37,7 @@ public class InnocentManager : MonoBehaviour
 
 
         if (currentInnocence <= 0f)
-            GameStateManager.Instance.TriggerGameOver();  // Ä¬ÈÏ false
+            GameStateManager.Instance.TriggerGameOver();  // é»˜è®¤ false
     }
 
     public void SetInnocenceToZero()

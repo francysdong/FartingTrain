@@ -2,15 +2,15 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    [Header("×·×ÙÄ¿±ê")]
-    public Transform target;                // ÍÏÈë½ÇÉ«
+    [Header("è¿½è¸ªç›®æ ‡")]
+    public Transform target;                // æ‹–å…¥è§’è‰²
 
-    [Header("×·×ÙÉèÖÃ")]
-    public float smoothSpeed = 5f;          // Ô½´óÔ½¸úÊÖ
-    public Vector2 offset;                  // ÉãÏñ»úÆ«ÒÆ
+    [Header("è¿½è¸ªè®¾ç½®")]
+    public float smoothSpeed = 5f;          // è¶Šå¤§è¶Šè·Ÿæ‰‹
+    public Vector2 offset;                  // æ‘„åƒæœºåç§»
 
-    [Header("±ß½çÏŞÖÆ")]
-    public bool useBounds = false;          // ÊÇ·ñÏŞÖÆÉãÏñ»ú·¶Î§
+    [Header("è¾¹ç•Œé™åˆ¶")]
+    public bool useBounds = false;          // æ˜¯å¦é™åˆ¶æ‘„åƒæœºèŒƒå›´
     public Vector2 minBounds;
     public Vector2 maxBounds;
 
@@ -21,13 +21,13 @@ public class CameraFollow : MonoBehaviour
         Vector3 targetPos = new Vector3(
             target.position.x + offset.x,
             target.position.y + offset.y,
-            transform.position.z          // ±£³Ö Z Öá²»±ä
+            transform.position.z          // ä¿æŒ Z è½´ä¸å˜
         );
 
-        // Æ½»¬×·×Ù
+        // å¹³æ»‘è¿½è¸ª
         transform.position = Vector3.Lerp(transform.position, targetPos, smoothSpeed * Time.deltaTime);
 
-        // ±ß½çÏŞÖÆ
+        // è¾¹ç•Œé™åˆ¶
         if (useBounds)
         {
             transform.position = new Vector3(

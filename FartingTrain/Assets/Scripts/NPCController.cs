@@ -6,21 +6,21 @@ public class NPCController : MonoBehaviour
     public enum NPCState { Relaxed, Alert, Suspicious, Confirmed }
     public enum PassengerState { OnBoard, MovingToExit, Exited }
 
-    [Header("·´Ó¦ãĞÖµ£¨Æ¨µÄ´óĞ¡£©")]
+    [Header("ååº”é˜ˆå€¼ï¼ˆå±çš„å¤§å°ï¼‰")]
     public float smallThreshold = 0.3f;
     public float mediumThreshold = 0.8f;
     public float largeThreshold = 1.5f;
 
-    [Header("×´Ì¬»ú²ÎÊı")]
-    public float alertToSuspiciousTime = 0.8f;   // ´Ó 2f ¸Ä¶Ì
+    [Header("çŠ¶æ€æœºå‚æ•°")]
+    public float alertToSuspiciousTime = 0.8f;   // ä» 2f æ”¹çŸ­
     public float suspicionDecayRate = 0.06f;
-    public float suspicionFloor = 0.2f;    // ĞÂÔö£ºÏûÉ¢ÏÂÏŞ£¬ÎÅµ½¹ı²»»áÍêÈ«¹éÁã
+    public float suspicionFloor = 0.2f;    // æ–°å¢ï¼šæ¶ˆæ•£ä¸‹é™ï¼Œé—»åˆ°è¿‡ä¸ä¼šå®Œå…¨å½’é›¶
     public float cooldownDuration = 5f;
 
-    [Header("½Ó´¥ÀäÈ´")]
+    [Header("æ¥è§¦å†·å´")]
     public float reactionCooldown = 0.8f;
 
-    [Header("ÏÂ³µÉèÖÃ")]
+    [Header("ä¸‹è½¦è®¾ç½®")]
     public float exitLeadTime = 0f;
     public float walkSpeed = 2f;
 
@@ -38,15 +38,15 @@ public class NPCController : MonoBehaviour
     private Transform playerTransform;
     private Coroutine cooldownCoroutine;
 
-    private bool hasEscalatedThisContact = false;  // ĞÂÔö×Ö¶Î
+    private bool hasEscalatedThisContact = false;  // æ–°å¢å­—æ®µ
 
 
-    // ©¤©¤©¤ ¶¯»­Ãû³£Á¿£¨¶ÔÓ¦ÄãµÄÎÄ¼şÃû£©©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤
+    // â”€â”€â”€ åŠ¨ç”»åå¸¸é‡ï¼ˆå¯¹åº”ä½ çš„æ–‡ä»¶åï¼‰â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const string ANIM_IDLE = "idle";
-    const string ANIM_ALERT = "notice_S";   // Ñ­»·¶¯»­
+    const string ANIM_ALERT = "notice_S";   // å¾ªç¯åŠ¨ç”»
     const string ANIM_SUSPICIOUS = "notice_M";
-    const string ANIM_CONFIRM_R = "notice_L";           // Íæ¼ÒÔÚÓÒ±ß
-    const string ANIM_CONFIRM_L = "notice_L_reversed";  // Íæ¼ÒÔÚ×ó±ß
+    const string ANIM_CONFIRM_R = "notice_L";           // ç©å®¶åœ¨å³è¾¹
+    const string ANIM_CONFIRM_L = "notice_L_reversed";  // ç©å®¶åœ¨å·¦è¾¹
     const string ANIM_WALK = "walk";
 
 
@@ -54,7 +54,7 @@ public class NPCController : MonoBehaviour
     {
         animator = GetComponent<Animator>();
 
-        // »º´æÍæ¼Ò Transform£¬±ÜÃâÃ¿Ö¡ Find
+        // ç¼“å­˜ç©å®¶ Transformï¼Œé¿å…æ¯å¸§ Find
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
             playerTransform = playerObj.transform;
@@ -66,7 +66,7 @@ public class NPCController : MonoBehaviour
         UpdateStateMachine();
     }
 
-    // ©¤©¤©¤ ×´Ì¬»ú ©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤
+    // â”€â”€â”€ çŠ¶æ€æœº â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     void UpdateStateMachine()
     {
         switch (currentState)
@@ -123,7 +123,7 @@ public class NPCController : MonoBehaviour
 
             case NPCState.Alert:
                 animator.Play(ANIM_ALERT, 0, 0f);
-                InnocentManager.Instance?.Deduct(1);  // ²¹ÉÏ
+                InnocentManager.Instance?.Deduct(1);  // è¡¥ä¸Š
                 break;
 
             case NPCState.Suspicious:
@@ -132,8 +132,8 @@ public class NPCController : MonoBehaviour
                 break;
 
             case NPCState.Confirmed:
-                // Íæ¼ÒÔÚÓÒ±ß ¡ú ²¥ L£¨Ö¸ÓÒ£©
-                // Íæ¼ÒÔÚ×ó±ß ¡ú ²¥ L_reversed£¨Ö¸×ó£©
+                // ç©å®¶åœ¨å³è¾¹ â†’ æ’­ Lï¼ˆæŒ‡å³ï¼‰
+                // ç©å®¶åœ¨å·¦è¾¹ â†’ æ’­ L_reversedï¼ˆæŒ‡å·¦ï¼‰
                 string confirmAnim = IsPlayerOnRight() ? ANIM_CONFIRM_L : ANIM_CONFIRM_R;
                 animator.Play(confirmAnim, 0, 0f);
                 InnocentManager.Instance?.Deduct(3);
@@ -154,7 +154,7 @@ public class NPCController : MonoBehaviour
         cooldownCoroutine = null;
     }
 
-    // ©¤©¤©¤ Íâ²¿½Ó¿Ú£¨Ç©Ãû²»±ä£¬FartEffect Ö±½Ó¶Ô½Ó£©©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤
+    // â”€â”€â”€ å¤–éƒ¨æ¥å£ï¼ˆç­¾åä¸å˜ï¼ŒFartEffect ç›´æ¥å¯¹æ¥ï¼‰â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     public void OnFartContact(float fartSize)
     {
         if (isExploded) return;
@@ -166,12 +166,12 @@ public class NPCController : MonoBehaviour
 
         if (!isInContact)
         {
-            // È«ĞÂµÄÒ»´Î½Ó´¥
+            // å…¨æ–°çš„ä¸€æ¬¡æ¥è§¦
             isInContact = true;
             hasEscalatedThisContact = false;
             currentReactionLevel = newLevel;
             lastReactionTime = Time.time;
-            // µÚÒ»´Î½Ó´¥£ºRelaxed/Alert ¡ú ÉÏÉıÒ»¼¶
+            // ç¬¬ä¸€æ¬¡æ¥è§¦ï¼šRelaxed/Alert â†’ ä¸Šå‡ä¸€çº§
             if (currentState == NPCState.Relaxed)
                 EnterState(NPCState.Alert);
             else if (currentState == NPCState.Alert)
@@ -181,8 +181,8 @@ public class NPCController : MonoBehaviour
         }
         else
         {
-            // Í¬Ò»´Î½Ó´¥³ÖĞø´¥·¢£¬Ê²Ã´¶¼²»×ö
-            // ×´Ì¬Éı¼¶Ö»ÔÚ OnFartLeave Ö®ºóµÄĞÂ½Ó´¥Àï´¥·¢
+            // åŒä¸€æ¬¡æ¥è§¦æŒç»­è§¦å‘ï¼Œä»€ä¹ˆéƒ½ä¸åš
+            // çŠ¶æ€å‡çº§åªåœ¨ OnFartLeave ä¹‹åçš„æ–°æ¥è§¦é‡Œè§¦å‘
         }
     }
 
@@ -192,7 +192,7 @@ public class NPCController : MonoBehaviour
         if (currentState == NPCState.Confirmed) return;
 
         isInContact = false;
-        hasEscalatedThisContact = false;  // ÖØÖÃ£¬µÈ´ıÏÂ´ÎĞÂ½Ó´¥
+        hasEscalatedThisContact = false;  // é‡ç½®ï¼Œç­‰å¾…ä¸‹æ¬¡æ–°æ¥è§¦
         currentFartSize = 0f;
         currentReactionLevel = 0;
     }
@@ -202,12 +202,12 @@ public class NPCController : MonoBehaviour
         isExploded = true;
         currentState = NPCState.Confirmed;
         if (cooldownCoroutine != null) StopCoroutine(cooldownCoroutine);
-        // ÓîÖæ´óÆ¨£ºÖ±½ÓÓÃ³¯ÏòÍæ¼ÒµÄÖ¸ÈÏ¶¯»­
+        // å®‡å®™å¤§å±ï¼šç›´æ¥ç”¨æœå‘ç©å®¶çš„æŒ‡è®¤åŠ¨ç”»
         string confirmAnim = IsPlayerOnRight() ? ANIM_CONFIRM_R : ANIM_CONFIRM_L;
         animator.Play(confirmAnim, 0, 0f);
     }
 
-    // ---- ÏÂ³µÂß¼­£¨ÓÉ TrainManager µ½Õ¾¹ã²¥´¥·¢£© ----
+    // ---- ä¸‹è½¦é€»è¾‘ï¼ˆç”± TrainManager åˆ°ç«™å¹¿æ’­è§¦å‘ï¼‰ ----
     public void BeginExit(Transform doorTarget)
     {
         if (passengerState != PassengerState.OnBoard) return;
@@ -241,7 +241,7 @@ public class NPCController : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    // ©¤©¤©¤ ¹¤¾ß·½·¨ ©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤
+    // â”€â”€â”€ å·¥å…·æ–¹æ³• â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     bool IsPlayerOnRight()
     {
         if (playerTransform == null) return true;
