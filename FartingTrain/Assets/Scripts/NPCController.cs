@@ -224,12 +224,14 @@ public class NPCController : MonoBehaviour
             dir > 0 ? Mathf.Abs(transform.localScale.x) : -Mathf.Abs(transform.localScale.x),
             transform.localScale.y, transform.localScale.z);
 
-        while (Vector3.Distance(transform.position, doorTarget.position) > 0.05f)
+        Vector3 walkTarget = new Vector3(doorTarget.position.x, transform.position.y, transform.position.z);
+
+        while (Vector3.Distance(transform.position, walkTarget) > 0.05f)
         {
             if (currentState == NPCState.Relaxed)
             {
                 if (!IsPlaying(ANIM_WALK)) animator.Play(ANIM_WALK, 0, 0f);
-                transform.position = Vector3.MoveTowards(transform.position, doorTarget.position, walkSpeed * Time.deltaTime);
+                transform.position = Vector3.MoveTowards(transform.position, walkTarget, walkSpeed * Time.deltaTime);
             }
             yield return null;
         }
