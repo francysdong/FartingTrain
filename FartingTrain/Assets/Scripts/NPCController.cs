@@ -3,7 +3,7 @@ using System.Collections;
 
 public class NPCController : MonoBehaviour
 {
-    public enum NPCState { Relaxed, Alert, Suspicious, Confirmed, Cooldown }
+    public enum NPCState { Relaxed, Alert, Suspicious, Confirmed }
 
     [Header("反应阈值（屁的大小）")]
     public float smallThreshold = 0.3f;
@@ -139,11 +139,7 @@ public class NPCController : MonoBehaviour
 
     IEnumerator CooldownRoutine()
     {
-        // 先播指认动画，等一小段再进冷却
-        yield return new WaitForSeconds(1.2f);
-        EnterState(NPCState.Cooldown);
-
-        yield return new WaitForSeconds(cooldownDuration);
+        yield return new WaitForSeconds(1.2f + cooldownDuration);
         suspicion = 0f;
         isInContact = false;
         currentReactionLevel = 0;
@@ -155,7 +151,7 @@ public class NPCController : MonoBehaviour
     public void OnFartContact(float fartSize)
     {
         if (isExploded) return;
-        if (currentState == NPCState.Confirmed || currentState == NPCState.Cooldown) return;
+        if (currentState == NPCState.Confirmed) return;
 
         currentFartSize = fartSize;
         int newLevel = GetLevel(fartSize);
@@ -186,7 +182,7 @@ public class NPCController : MonoBehaviour
     public void OnFartLeave()
     {
         if (isExploded) return;
-        if (currentState == NPCState.Confirmed || currentState == NPCState.Cooldown) return;
+        if (currentState == NPCState.Confirmed) return;
 
         isInContact = false;
         hasEscalatedThisContact = false;  // 重置，等待下次新接触
