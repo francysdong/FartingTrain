@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 998165981507571031}
   - component: {fileID: 2599407681363658048}
-  - component: {fileID: 5623151787938174881}
+  - component: {fileID: 6536802628598800919}
   - component: {fileID: 1555208672934969787}
   - component: {fileID: 5836584473492088390}
   m_Layer: 7
@@ -90,7 +90,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &5623151787938174881
+--- !u!114 &6536802628598800919
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -99,17 +99,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 2096847598313305309}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db7ffff7f3a970e418725dcf0f8b3d55, type: 3}
+  m_Script: {fileID: 11500000, guid: caca8b91a2646aa46a8932daaad0f692, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smallThreshold: 0.2
-  mediumThreshold: 0.6
+  smallThreshold: 0.5
+  mediumThreshold: 0.8
   largeThreshold: 1
   alertToSuspiciousTime: 1
   suspicionDecayRate: 0.06
   suspicionFloor: 0.2
   cooldownDuration: 1
   reactionCooldown: 0.5
+  exitLeadTime: 0
+  walkSpeed: 2
+  dozeCheckInterval: 1
+  dozeChance: 0.3
+  yawnDuration: 1
+  shockDuration: 0.5
+  sleepSensitivityMultiplier: 3
+  sleepDeductionMultiplier: 1.5
 --- !u!95 &1555208672934969787
 Animator:
   serializedVersion: 7
