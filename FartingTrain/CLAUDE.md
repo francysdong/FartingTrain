@@ -34,9 +34,20 @@ Untitled Goose Game / Human Fall Flat / Katamari Damacy / Getting Over It
 
 核心脚本（都在项目里，具体路径以实际代码库为准）：
 
-- `NPCController.cs` — NPC状态机：Relaxed → Alert → Suspicious → Confirmed，
-  跟屁接触事件驱动状态转换。已实现"社畜大叔"NPC，带权重idle行为和
-  瞌睡过渡逻辑
+- `NPCController.cs` — NPC共享基类，两条并行状态轴：警觉状态机
+  （Relaxed→Alert→Suspicious→Confirmed，跟屁接触事件驱动）+ 乘客/
+  下车状态（OnBoard→MovingToExit→Exited，由TrainManager到站广播
+  驱动）。开放了一批`protected`字段和`virtual`方法/钩子
+  （`OnUpdateExtra()`、`CanWalk`、`EnterState(state, confirmLevel,
+  multiplier)`），供角色专属子类接管/暂停基础逻辑，不用改这个文件
+  本身
+- `OjisanNPCController.cs` — 继承自NPCController，"社畜大叔"专属。
+  打盹状态轴：Awake→Yawning→Asleep→[自然醒 或 Shocked→指认]，跟
+  警觉/下车两条轴通过`CanWalk`等钩子仲裁优先级（被抓包演出优先级
+  最高，不会被下车广播打断；打盹只在两条基础轴都空闲时触发）
+- `TrainManager.cs` — 行驶计时+到站判断；`exitingNpcs`列表配置"本关
+  谁在哪个门下车"，到站前按`approachLeadTime`提前广播
+  `onApproachingStation`，通知列表里的NPC开始走向指定门
 - `PlayerController.cs` — 玩家控制
 - `GasManager.cs` — 玩家放屁状态管理：Normal / Medium / Hard 三档，
   对应不同动画组和移动速度倍率
@@ -44,12 +55,21 @@ Untitled Goose Game / Human Fall Flat / Katamari Damacy / Getting Over It
   社会性死亡值(social death value)量表
 - `FartEffect.cs` — 屁效果的云状爆发+飘散粒子行为
 - `FartSoundManager.cs` — 单例，屁音效池化播放，避免连续重复音效
-- `InnocentManager.cs` — 清白值/嫌疑管理
+- `InnocentManager.cs` — 清白值/嫌疑管理。`Deduct(int reactionLevel,
+  float multiplier = 1f)`认的是"第几档"（1/2/3，对应
+  small/medium/largeDeduction），不是直接扣分数值——传其他数字会
+  静默扣0，需要更重的惩罚要用`largeDeduction × multiplier`，不要
+  加新的硬编码档位
 
 ## 代码架构偏好（重要）
 
 - **优先扩展现有脚本，而不是新建脚本**。除非确实是完全独立的新系统
   （比如关卡配置这种），否则先看能不能塞进现有文件的结构里
+- **NPC共享轴 vs 角色专属行为要分开**：所有NPC都有的基础能力（警觉
+  状态机、乘客/下车状态）留在`NPCController`；某个角色独有的怪癖
+  （比如大叔的打盹）用继承子类（`XxxNPCController : NPCController`），
+  通过`protected`字段+`virtual`钩子接入，不要在`NPCController`里
+  堆一堆`canXXX`开关——不然以后NPC越加越多，基类会变成大杂烩
 - **动画全部代码驱动**，用 `animator.Play()` 直接切换，不用Animator
   Transition图形化连线那套
 - 命名习惯、代码风格以现有文件为准，新代码要跟现有风格保持一致
@@ -64,30 +84,39 @@ Untitled Goose Game / Human Fall Flat / Katamari Damacy / Getting Over It
 3. **星级系统**用于跨关卡分组门控进度
 4. **NPC行为设计模式**：权重随机idle行为 + 手动编写的触发层，用来创造
    刻意的"安全窗口"，不是纯随机
+5. **多条并行状态轴是可行的**：警觉状态机、乘客/下车状态、大叔专属的
+   打盹状态，三条轴同时存在没有互相打架，靠的是显式的优先级仲裁——
+   谁在忙就用一个钩子（`CanWalk`之类）让其他轴让路，而不是互相监听
+   事件猜时序。以后再加新轴照这个模式接
+6. **周期性概率判定要给"退出"留口子**：任何"进入某状态后就一直待着"
+   的设计（比如打盹）都要配一个对称的"有概率自动离开"判定，不然容易
+   变成可以被玩家利用的安全区
 
 ## 当前正在做/接下来要扩展的方向
 
-正在把NPC底层逻辑拆成清晰的几层（这是当前会话的核心任务）：
+正在把NPC底层逻辑拆成清晰的几层：
 
-### 1. 底层逻辑（NPC基础行为层）
+### 1. 底层逻辑（NPC基础行为层）—— 尚未做
 - 性格原型数据：嗅觉敏感度阈值、反应速度、移动模式、记忆时长，因NPC而异
-- 建议用 ScriptableObject 承载这些数值，方便策划直接调参不用改代码
-- 现有状态机（Relaxed→Alert→Suspicious→Confirmed）结构保留，但转换阈值
-  应该读取性格原型数据，而不是写死的常量
+- 原计划用ScriptableObject承载数值；实际先走了另一条路——数值差异用
+  public字段挂在NPCController/子类实例上（Inspector里per-NPC调），行为
+  差异（比如打盹）用继承子类。要不要再引入ScriptableObject看后续需求，
+  暂时没这个必要
+- 现有状态机（Relaxed→Alert→Suspicious→Confirmed）结构保留，转换阈值
+  仍是写死的public字段，还没有"因性格原型联动"这一层
 
-### 2. 跟屁互动逻辑
-- 接触事件 → 根据性格原型的嗅觉阈值决定升几级、升级速度、记忆衰减速度
+### 2. 跟屁互动逻辑 —— 尚未做
 - 计划中的"甩锅"主动技能：玩家可以把嫌疑目标从自己身上转移到附近NPC身上，
   应该做成独立方法，供外部（玩家技能系统）调用
 - 计划中的"憋住"机制：创造压力值资源管理的张力（尚未设计细节）
 
-### 3. 上下车逻辑（关卡差异化，每关可能不同）
-- 建议做成关卡配置驱动：每关一份"站点事件表"（ScriptableObject或JSON），
-  定义哪一站谁上车/下车/移动到哪节车厢
-- NPCController需要加一条轻量的"乘客生命周期"状态（不在场/上车动画/在场/
-  下车动画），**跟原有的警觉状态机并行、独立的两条轴**，不要揉进同一个
-  enum里，避免状态爆炸
-- 还未设计：气味残留累积、移动中的NPC作为障碍物
+### 3. 上下车逻辑 —— 已实现
+- `TrainManager.exitingNpcs`（`List<StationExitEntry>`）配置本关谁在哪个
+  门下车，到站前`approachLeadTime`秒广播`onApproachingStation`并调用
+  对应NPC的`BeginExit(doorTarget)`
+- `NPCController`新增`PassengerState`轴（OnBoard/MovingToExit/Exited），
+  跟警觉状态机并行独立，走路时若被屁打断会原地暂停等警觉状态机接管
+- 还未设计：气味残留累积、移动中的NPC作为障碍物、多站点（目前一关一站）
 
 ## 工作方式偏好
 
