@@ -22,7 +22,7 @@ public class InnocentManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    public void Deduct(int reactionLevel)
+    public void Deduct(int reactionLevel, float multiplier = 1f)
     {
         float amount = reactionLevel switch
         {
@@ -31,6 +31,7 @@ public class InnocentManager : MonoBehaviour
             3 => largeDeduction,
             _ => 0f
         };
+        amount *= multiplier;
 
         currentInnocence = Mathf.Clamp(currentInnocence - amount, 0f, maxInnocence);
         onInnocenceChanged?.Invoke(currentInnocence / maxInnocence);

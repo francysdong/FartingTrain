@@ -24,8 +24,8 @@ public class NPCController : MonoBehaviour
     public float exitLeadTime = 0f;
     public float walkSpeed = 2f;
 
-    private NPCState currentState = NPCState.Relaxed;
-    private PassengerState passengerState = PassengerState.OnBoard;
+    protected NPCState currentState = NPCState.Relaxed;
+    protected PassengerState passengerState = PassengerState.OnBoard;
     private float suspicion = 0f;
     private float alertTimer = 0f;
     private bool isInContact = false;
@@ -34,7 +34,7 @@ public class NPCController : MonoBehaviour
     private int currentReactionLevel = 0;
     private bool isExploded = false;
 
-    private Animator animator;
+    protected Animator animator;
     private Transform playerTransform;
     private Coroutine cooldownCoroutine;
 
@@ -42,12 +42,12 @@ public class NPCController : MonoBehaviour
 
 
     // ─── 动画名常量（对应你的文件名）──────────────────────────
-    const string ANIM_IDLE = "idle";
-    const string ANIM_ALERT = "notice_S";   // 循环动画
-    const string ANIM_SUSPICIOUS = "notice_M";
-    const string ANIM_CONFIRM_R = "notice_L";           // 玩家在右边
-    const string ANIM_CONFIRM_L = "notice_L_reversed";  // 玩家在左边
-    const string ANIM_WALK = "walk";
+    protected const string ANIM_IDLE = "idle";
+    protected const string ANIM_ALERT = "notice_S";   // 循环动画
+    protected const string ANIM_SUSPICIOUS = "notice_M";
+    protected const string ANIM_CONFIRM_R = "notice_L";           // 玩家在右边
+    protected const string ANIM_CONFIRM_L = "notice_L_reversed";  // 玩家在左边
+    protected const string ANIM_WALK = "walk";
 
 
     void Start()
@@ -64,7 +64,13 @@ public class NPCController : MonoBehaviour
     {
         if (isExploded) return;
         UpdateStateMachine();
+        OnUpdateExtra();
     }
+
+    protected virtual void OnUpdateExtra() { }
+
+    // 子类可用于临时阻止走路/动画被下车逻辑接管（比如正处于一个不该被打断的专属演出中）
+    protected virtual bool CanWalk => true;
 
     // ─── 状态机 ───────────────────────────────────────────────
     void UpdateStateMachine()
@@ -109,7 +115,7 @@ public class NPCController : MonoBehaviour
         }
     }
 
-    void EnterState(NPCState newState)
+    protected void EnterState(NPCState newState, int confirmLevel = 3, float confirmDeductionMultiplier = 1f)
     {
         currentState = newState;
         alertTimer = 0f;
@@ -136,7 +142,7 @@ public class NPCController : MonoBehaviour
                 // 玩家在左边 → 播 L_reversed（指左）
                 string confirmAnim = IsPlayerOnRight() ? ANIM_CONFIRM_L : ANIM_CONFIRM_R;
                 animator.Play(confirmAnim, 0, 0f);
-                InnocentManager.Instance?.Deduct(3);
+                InnocentManager.Instance?.Deduct(confirmLevel, confirmDeductionMultiplier);
                 if (cooldownCoroutine != null) StopCoroutine(cooldownCoroutine);
                 cooldownCoroutine = StartCoroutine(CooldownRoutine());
                 break;
@@ -155,7 +161,7 @@ public class NPCController : MonoBehaviour
     }
 
     // ─── 外部接口（签名不变，FartEffect 直接对接）────────────
-    public void OnFartContact(float fartSize)
+    public virtual void OnFartContact(float fartSize)
     {
         if (isExploded) return;
         if (currentState == NPCState.Confirmed) return;
@@ -208,7 +214,7 @@ public class NPCController : MonoBehaviour
     }
 
     // ---- 下车逻辑（由 TrainManager 到站广播触发） ----
-    public void BeginExit(Transform doorTarget)
+    public virtual void BeginExit(Transform doorTarget)
     {
         if (passengerState != PassengerState.OnBoard) return;
         StartCoroutine(ExitRoutine(doorTarget));
@@ -228,7 +234,7 @@ public class NPCController : MonoBehaviour
 
         while (Vector3.Distance(transform.position, walkTarget) > 0.05f)
         {
-            if (currentState == NPCState.Relaxed)
+            if (currentState == NPCState.Relaxed && CanWalk)
             {
                 if (!IsPlaying(ANIM_WALK)) animator.Play(ANIM_WALK, 0, 0f);
                 transform.position = Vector3.MoveTowards(transform.position, walkTarget, walkSpeed * Time.deltaTime);
@@ -236,7 +242,7 @@ public class NPCController : MonoBehaviour
             yield return null;
         }
 
-        if (currentState == NPCState.Relaxed) animator.Play(ANIM_IDLE, 0, 0f);
+        if (currentState == NPCState.Relaxed && CanWalk) animator.Play(ANIM_IDLE, 0, 0f);
         yield return new WaitUntil(() => TrainManager.Instance != null && TrainManager.Instance.HasArrived);
 
         passengerState = PassengerState.Exited;
@@ -252,16 +258,16 @@ public class NPCController : MonoBehaviour
         return result;
     }
 
-    bool IsPlaying(string animName)
+    protected bool IsPlaying(string animName)
     {
         return animator.GetCurrentAnimatorStateInfo(0).IsName(animName);
     }
 
-    int GetLevel(float size)
+    protected int GetLevel(float size, float thresholdMultiplier = 1f)
     {
-        if (size >= largeThreshold) return 3;
-        if (size >= mediumThreshold) return 2;
-        if (size >= smallThreshold) return 1;
+        if (size >= largeThreshold * thresholdMultiplier) return 3;
+        if (size >= mediumThreshold * thresholdMultiplier) return 2;
+        if (size >= smallThreshold * thresholdMultiplier) return 1;
         return 0;
     }
 
