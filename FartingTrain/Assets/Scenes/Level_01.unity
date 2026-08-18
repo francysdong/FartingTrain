@@ -478,7 +478,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93f7270a2ea45ae429c2bc8bffdf8bd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tripDuration: 50
+  tripDuration: 20
   isMoving: 1
   onArrived:
     m_PersistentCalls:
@@ -497,6 +497,8 @@ MonoBehaviour:
         m_CallState: 2
   exitingNpcs:
   - npc: {fileID: 1439984529}
+    doorTarget: {fileID: 1814790540}
+  - npc: {fileID: 1268837529}
     doorTarget: {fileID: 1814790540}
   approachLeadTime: 10
   onApproachingStation:
@@ -756,6 +758,11 @@ MonoBehaviour:
   hardSpeedMultiplier: 0.4
   fartPrefab: {fileID: 7334870609248971544, guid: 10ce9bfeb050d144f9217920bba4de89, type: 3}
   fartOffset: {x: -2, y: -1}
+  npcLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  soundRadiusMin: 1
+  soundRadiusMax: 3
   maxChargeTime: 2
   mediumThreshold: 0.4
   hardThreshold: 0.7
@@ -2916,6 +2923,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7bd48162da2ca8d4f83a3df581be43df, type: 3}
+--- !u!114 &1268837529 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4851387278632383509, guid: 7458c034b0b060142b3cd02758328e9e, type: 3}
+  m_PrefabInstance: {fileID: 211487382015774767}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 478ff1314282b484fbd433c3f8ebf1db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1282885218
 GameObject:
   m_ObjectHideFlags: 0
@@ -4441,7 +4459,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 998165981507571031, guid: 7458c034b0b060142b3cd02758328e9e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.37
+      value: 0.16
       objectReference: {fileID: 0}
     - target: {fileID: 998165981507571031, guid: 7458c034b0b060142b3cd02758328e9e, type: 3}
       propertyPath: m_LocalPosition.z
@@ -4481,7 +4499,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2096847598313305309, guid: 7458c034b0b060142b3cd02758328e9e, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4851387278632383509, guid: 7458c034b0b060142b3cd02758328e9e, type: 3}
+      propertyPath: posture
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

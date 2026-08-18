@@ -110,13 +110,17 @@ MonoBehaviour:
   suspicionFloor: 0.2
   cooldownDuration: 1
   reactionCooldown: 0.5
+  smellSensitivity: 0.5
+  soundSensitivity: 0.5
+  soundReactionHoldTime: 2
   exitLeadTime: 0
   walkSpeed: 2
   dozeCheckInterval: 1
   dozeChance: 0.3
+  wakeChance: 0.3
   yawnDuration: 1
   shockDuration: 0.5
-  sleepSensitivityMultiplier: 3
+  sleepSensitivity: 0.4
   sleepDeductionMultiplier: 1.5
 --- !u!95 &1555208672934969787
 Animator:
