@@ -15,6 +15,11 @@ public class PlayerController : MonoBehaviour
     public GameObject fartPrefab;
     public Vector2 fartOffset = new Vector2(-0.5f, 0f);
 
+    [Header("屁声音（放屁瞬间广播，跟蓄力大小挂钩）")]
+    public LayerMask npcLayer;
+    public float soundRadiusMin = 2f;
+    public float soundRadiusMax = 6f;
+
     [Header("蓄气参数")]
     public float maxChargeTime = 2f;
 
@@ -219,10 +224,25 @@ public class PlayerController : MonoBehaviour
 
         GameObject fart = Instantiate(fartPrefab, spawnPos, Quaternion.identity);
         FartEffect effect = fart.GetComponent<FartEffect>();
-        if (effect != null) effect.ApplyCharge(chargeRatio, direction);
+        if (effect != null)
+        {
+            effect.ApplyCharge(chargeRatio, direction);
+            BroadcastFartSound(spawnPos, effect.CurrentSize, chargeRatio);
+        }
 
         float deduction = GasManager.Instance.maxGas * chargeRatio * GasManager.Instance.maxFartDeductionRatio;
         GasManager.Instance.DeductGas(deduction);
+    }
+
+    void BroadcastFartSound(Vector2 position, float fartSize, float chargeRatio)
+    {
+        float radius = Mathf.Lerp(soundRadiusMin, soundRadiusMax, chargeRatio);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(position, radius, npcLayer);
+        foreach (Collider2D hit in hits)
+        {
+            NPCController npc = hit.GetComponent<NPCController>();
+            npc?.OnFartSound(fartSize);
+        }
     }
 
     void OnCollisionEnter2D(Collision2D collision)
