@@ -11,7 +11,7 @@ public class OjisanNPCController : NPCController
     public float wakeChance = 0.3f;
     public float yawnDuration = 1f;
     public float shockDuration = 0.6f;
-    public float sleepSensitivityMultiplier = 2f;
+    public float sleepSensitivity = 0.4f;   // 睡眠时对味道的灵敏度，1为清醒基准，越小越迟钝
     public float sleepDeductionMultiplier = 1.5f;
 
     const string ANIM_YAWN = "yawn";
@@ -48,6 +48,9 @@ public class OjisanNPCController : NPCController
 
     protected override bool CanWalk => dozeState != DozeState.Shocked;
 
+    protected override float EffectiveSoundSensitivity =>
+        soundSensitivity * (dozeState == DozeState.Asleep ? sleepSensitivity : 1f);
+
     void WakeNaturally()
     {
         dozeState = DozeState.Awake;
@@ -70,21 +73,40 @@ public class OjisanNPCController : NPCController
         dozeState = DozeState.Awake;
     }
 
-    public override void OnFartContact(float fartSize)
+    // 返回true表示这次判定已经被打盹逻辑接管，调用方不用再走正常逻辑
+    bool InterceptForDoze(float fartSize, float awakeSensitivity, float asleepSensitivity)
     {
-        if (dozeState == DozeState.Shocked) return;
+        if (dozeState == DozeState.Shocked) return true;
 
         if (dozeState == DozeState.Asleep)
         {
-            if (GetLevel(fartSize, sleepSensitivityMultiplier) == 0) return;
+            if (GetLevel(fartSize, asleepSensitivity) == 0) return true;
             CancelDoze();
             dozeState = DozeState.Shocked;
             StartCoroutine(ShockAndConfirmRoutine());
-            return;
+            return true;
         }
 
-        if (dozeState == DozeState.Yawning) CancelDoze();
+        if (dozeState == DozeState.Yawning)
+        {
+            // 太小的接触不该打断哈欠——不然协程被取消却没有别的东西接管动画，会卡在哈欠画面里
+            if (GetLevel(fartSize, awakeSensitivity) == 0) return true;
+            CancelDoze();
+        }
+
+        return false;
+    }
+
+    public override void OnFartContact(float fartSize)
+    {
+        if (InterceptForDoze(fartSize, smellSensitivity, sleepSensitivity)) return;
         base.OnFartContact(fartSize);
+    }
+
+    public override void OnFartSound(float fartSize)
+    {
+        if (InterceptForDoze(fartSize, soundSensitivity, EffectiveSoundSensitivity)) return;
+        base.OnFartSound(fartSize);
     }
 
     IEnumerator ShockAndConfirmRoutine()
